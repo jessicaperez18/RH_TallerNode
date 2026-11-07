@@ -52,26 +52,33 @@ rh.delete("/:id", async (req, res, next) => {
 });
 
 rh.put("/:id", async (req, res, next) => {
-    if (!/^[0-9]{1,3}$/.test(req.params.id)) {
+    if (!/^[0-9]+$/.test(req.params.id)) {
         return next();
     }
 
-    const { pok_name, pok_height, pok_weight, pok_base_experience } = req.body;
+    const { nombre, apellidos, telefono, email, direccion } = req.body;
 
-    if (pok_name && pok_height && pok_weight && pok_base_experience) {
-        let query = `UPDATE pokemon SET pok_name='${pok_name}', pok_height=${pok_height},`;
-        query += `pok_weight=${pok_weight},pok_base_experience=${pok_base_experience} WHERE pok_id = ${req.params.id};`;
+    if (nombre && apellidos && telefono && email && direccion) {
+        try {
+            const query = `UPDATE empleado 
+                SET nombre = ?, apellidos = ?, telefono = ?, email = ?, direccion = ? 
+                WHERE id_empleado = ?`;
+            const [result] = await db.query(query, [
+                nombre, apellidos, telefono, email, direccion, req.params.id
+            ]);
 
-        const rows = await db.query(query);
+            if (result.affectedRows === 1) {
+                return res.status(200).json({ code: 200, message: "Empleado actualizado correctamente" });
+            }
 
-        if (rows.affectedRows == 1) {
-            return res.status(200).json({ code: 200, message: "Pokemon actualizado correctamente" });
+            return res.status(404).json({ code: 404, message: "Empleado no encontrado" });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ code: 500, message: "Error interno del servidor" });
         }
-
-        return res.status(500).json({ code: 500, message: "Ocurrió un error" });
     }
-    return res.status(500).json({ code: 500, message: "Campos incompletos" });
 
+    return res.status(400).json({ code: 400, message: "Campos incompletos" });
 });
 
 rh.patch("/:id", async (req, res, next) => {
