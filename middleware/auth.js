@@ -1,12 +1,17 @@
 const jwt = require('jsonwebtoken');
-module.exports = (req, res, next) =>{
+
+module.exports = (req, res, next) => {
     try {
-        const token = req.headers.authorization.split(" ")[1];
-        const decoded = jwt.verify(token, "debugkey");
-        req.user = decoded;
-        next();
-    } catch (error){
-        
-        return res.status(401).json({code: 401, message:"No tienes permiso :("});
+        const header = req.headers.authorization || '';
+        const [tipo, token] = header.split(' ');
+
+        if (tipo !== 'Bearer' || !token) {
+            return res.status(401).json({ code: 401, message: 'Token requerido' });
+        }
+
+        req.user = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
+        return next();
+    } catch (error) {
+        return res.status(401).json({ code: 401, message: 'Token inválido o expirado' });
     }
-}
+};

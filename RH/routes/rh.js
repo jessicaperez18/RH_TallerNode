@@ -1,8 +1,9 @@
 const express = require('express');
 const rh = express.Router();
 const db = require('../config/database');
+const verificarToken = require('../middleware/auth');
+rh.use(verificarToken);
 
-// Crear un empleado
 
 const COLUMNAS = 'id_empleado, nombre, apellidos, telefono, email, direccion';
 
