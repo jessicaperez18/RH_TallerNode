@@ -139,15 +139,15 @@ rh.get('/:id', async (req, res, next) => {
 
     const id = Number(req.params.id);
 
-    if (id < 1 || id > MAX_POKEMON_ID) {
-        return res.status(404).json({ code: 404, message: 'Pokemon no encontrado' });
+    if (id < 1 || id > MAX_EMP_ID) {
+        return res.status(404).json({ code: 404, message: 'Empleado no encontrado' });
     }
 
     try {
-        const [rows] = await db.query('SELECT * FROM pokemon WHERE pok_id = ?', [id]);
+        const [rows] = await db.query('SELECT * FROM empleado WHERE id_empleado = ?', [id]);
 
         if (rows.length === 0) {
-            return res.status(404).json({ code: 404, message: 'Pokemon no encontrado' });
+            return res.status(404).json({ code: 404, message: 'Empleado no encontrado' });
         }
 
         return res.status(200).json({ code: 200, message: rows[0] });
