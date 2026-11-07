@@ -86,15 +86,15 @@ rh.patch("/:id", async (req, res, next) => {
         return next();
     }
 
-    if (req.body.pok_name) {
+    if (req.body.name) {
 
-        let query = `UPDATE pokemon SET pok_name='${req.body.pok_name}' WHERE pok_id=${req.params.id}`;
+        let query = `UPDATE empleado SET name='${req.body.name}' WHERE id_empleado=${req.params.id}`;
 
 
         const rows = await db.query(query);
 
         if (rows.affectedRows == 1) {
-            return res.status(200).json({ code: 200, message: "Pokemon actualizado correctamente" });
+            return res.status(200).json({ code: 200, message: "Empleado actualizado correctamente" });
         }
         return res.status(500).json({ code: 500, message: "Ocurrió un error" });
     }
