@@ -5,15 +5,15 @@ const db = require('../config/database');
 const MAX_EMP_ID = 10000;
 // Crear un empleado
 rh.post("/", async (req, res, next) => {
-    const { emp_name, emp_apellidos, emp_telefono, emp_email, emp_direccion } = req.body;
+    const { nombre, apellidos, telefono, email, direccion } = req.body;
 
-    if (emp_name && emp_apellidos && emp_telefono && emp_email && emp_direccion) {
+    if (nombre && apellidos && telefono && email && direccion) {
         try {
             const query = `INSERT INTO empleado 
-                (emp_name, emp_apellidos, emp_telefono, emp_email, emp_direccion) 
+                (nombre, apellidos, telefono, email, direccion) 
                 VALUES (?, ?, ?, ?, ?)`;
             const rows = await db.query(query, [
-                emp_name, emp_apellidos, emp_telefono, emp_email, emp_direccion
+                nombre, apellidos, telefono, email, direccion
             ]);
 
             if (rows.affectedRows == 1) {
@@ -37,14 +37,14 @@ rh.delete("/:id", async (req, res, next) => {
 
     try {
         const [result] = await db.query(
-            "DELETE FROM pokemon WHERE pok_id = ?",
+            "DELETE FROM empleado WHERE id_empleado = ?",
             [req.params.id]
         );
 
         if (result.affectedRows === 1) {
-            return res.status(200).json({ code: 200, message: "Pokemon borrado correctamente" });
+            return res.status(200).json({ code: 200, message: "Empleado borrado correctamente" });
         }
-        return res.status(404).json({ code: 404, message: "Pokemon no encontrado" });
+        return res.status(404).json({ code: 404, message: "Empleado no encontrado" });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ code: 500, message: "Error interno del servidor" });
