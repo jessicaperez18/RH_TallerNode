@@ -82,32 +82,52 @@ rh.put("/:id", async (req, res, next) => {
 });
 
 rh.patch("/:id", async (req, res, next) => {
-    if (!/^[0-9]{1,3}$/.test(req.params.id)) {
+    if (!/^[0-9]+$/.test(req.params.id)) {
         return next();
     }
 
-    if (req.body.name) {
+    // Solo se permiten estas columnas (lista blanca)
+    const permitidos = ["nombre", "apellidos", "telefono", "email", "direccion"];
+    const campos = [];
+    const valores = [];
 
-        let query = `UPDATE empleado SET name='${req.body.name}' WHERE id_empleado=${req.params.id}`;
+    for (const campo of permitidos) {
+        if (req.body[campo] !== undefined && req.body[campo] !== "") {
+            campos.push(`${campo} = ?`);
+            valores.push(req.body[campo]);
+        }
+    }
 
+    if (campos.length === 0) {
+        return res.status(400).json({ code: 400, message: "Campos incompletos" });
+    }
 
-        const rows = await db.query(query);
+    try {
+        valores.push(req.params.id);
+        const query = `UPDATE empleado SET ${campos.join(", ")} WHERE id_empleado = ?`;
+        const [result] = await db.query(query, valores);
 
-        if (rows.affectedRows == 1) {
+        if (result.affectedRows === 1) {
             return res.status(200).json({ code: 200, message: "Empleado actualizado correctamente" });
         }
-        return res.status(500).json({ code: 500, message: "Ocurrió un error" });
+
+        return res.status(404).json({ code: 404, message: "Empleado no encontrado" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ code: 500, message: "Error interno del servidor" });
     }
-    return res.status(500).json({ code: 500, message: "Campos incompletos" });
 });
 
-// Listar todos los pokemon
+// Listar todos los empleados
 rh.get('/', async (req, res, next) => {
     try {
-        const pkmn = await db.query('SELECT * FROM pokemon');
-        return res.status(200).json({ code: 200, message: pkmn });
+        const [emp] = await db.query(
+            'SELECT id_empleado, nombre, apellidos, telefono, email, direccion FROM empleado'
+        );
+        return res.status(200).json({ code: 200, data: emp });
     } catch (err) {
-        return next(err);
+        console.error(err);
+        return res.status(500).json({ code: 500, message: "Error interno del servidor" });
     }
 });
 
