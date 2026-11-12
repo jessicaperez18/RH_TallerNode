@@ -1,16 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>RH Taller Node</title>
 </head>
 
 <body>
+    <noscript>
+        <p>Esta aplicación requiere JavaScript. <a href="login.html">Ir al inicio de sesión</a></p>
+    </noscript>
+
     <script>
-        window.location.href = "login.html";
+        if (localStorage.getItem("token")) {
+            window.location.replace("rh.html");
+        } else {
+            window.location.replace("login.html");
+        }
     </script>
 </body>
+
 </html>

@@ -1,13 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RH</title>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src = ./js/rh.js></script>
+    <title>Empleados - RH Taller Node</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js" defer></script>
+    <script src="./js/rh.js" defer></script>
 </head>
+
 <body>
-    <h1>Bienvenido a RH del Taller de Node </h1>
+    <div class="container">
+
+        <!-- Encabezado -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <h1>Bienvenido a RH del Taller de Node</h1>
+            <button id="btn-logout" class="btn btn-outline-secondary btn-sm">Cerrar sesión</button>
+        </div>
+
+        <!-- Búsqueda por nombre + botón de alta -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap mt-4">
+            <form id="form-buscar" class="form-inline mb-2" novalidate>
+                <label for="input-buscar" class="sr-only">Buscar por nombre</label>
+                <input type="text" id="input-buscar" class="form-control mr-2"
+                    placeholder="Buscar por nombre" maxlength="100" autocomplete="off">
+                <button type="submit" class="btn btn-primary mr-2">Buscar</button>
+                <button type="button" id="btn-limpiar" class="btn btn-outline-secondary">Ver todos</button>
+            </form>
+            <button type="button" id="btn-nuevo" class="btn btn-success mb-2">+ Agregar empleado</button>
+        </div>
+
+        <!-- Formulario de alta / edición (oculto hasta que se necesite) -->
+        <div id="panel-formulario" class="card mt-3" style="display: none;">
+            <div class="card-body">
+                <h2 id="titulo-formulario" class="h5">Agregar empleado</h2>
+                <form id="form-empleado" novalidate>
+                    <input type="hidden" id="emp-id">
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="emp-nombre">Nombre</label>
+                            <input type="text" class="form-control" id="emp-nombre" maxlength="100" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="emp-apellidos">Apellidos</label>
+                            <input type="text" class="form-control" id="emp-apellidos" maxlength="150" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="emp-telefono">Teléfono</label>
+                            <input type="tel" class="form-control" id="emp-telefono" maxlength="20" required>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="emp-email">Correo electrónico</label>
+                            <input type="email" class="form-control" id="emp-email" maxlength="150" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="emp-direccion">Dirección</label>
+                        <input type="text" class="form-control" id="emp-direccion" maxlength="255" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" id="btn-cancelar" class="btn btn-secondary">Cancelar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de empleados -->
+        <h2 class="h4 mt-4">Empleados</h2>
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Dirección</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-empleados"></tbody>
+            </table>
+        </div>
+        <p id="mensaje-vacio" class="text-muted" style="display: none;">No se encontraron empleados.</p>
+
+    </div>
 </body>
+
 </html>

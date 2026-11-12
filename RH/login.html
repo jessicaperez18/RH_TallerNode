@@ -1,17 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Pokedex</title>
+    <title>Inicio de sesión - RH Taller Node</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="./js/login.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.2/axios.min.js" defer></script>
+    <script src="./js/login.js" defer></script>
 </head>
 
 <body>
@@ -23,21 +19,22 @@
         </div>
         <div class="row align-items-center">
             <div class="col-6 offset-3">
-                <div class="form-group">
-                    <label for="input-mail">Correo electrónico</label>
-                    <input type="email" class="form-control" id="input-mail" placeholder="correo@dominio.ext">
-                    <small class="form-text text-muted">El correo con el que te registraste.</small>
-                </div>
-                <div class="form-group">
-                    <label for="input-password">Contraseña</label>
-                    <input type="password" class="form-control" id="input-password" placeholder="***********">
-                </div>
-                <div class="d-flex justify-content-between">
-                    <button class="btn btn-primary">Entrar</button>
-                    <button class="btn btn-secondary">Registro</button>
-                </div>
+                <form id="form-login" novalidate>
+                    <div class="form-group">
+                        <label for="input-mail">Correo electrónico</label>
+                        <input type="email" class="form-control" id="input-mail"
+                            placeholder="correo@dominio.ext" autocomplete="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="input-password">Contraseña</label>
+                        <input type="password" class="form-control" id="input-password"
+                            placeholder="Contraseña" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </form>
             </div>
         </div>
     </div>
 </body>
+
 </html>
