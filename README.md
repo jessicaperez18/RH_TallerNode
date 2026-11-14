@@ -1,4 +1,3 @@
-# RH_TallerNode
 # RH Taller Node
 
 Sistema de administración de empleados para el departamento de Recursos Humanos de **Taller de Node.js S.A. de C.V.**, desarrollado como proyecto final del Taller Especializado de Node.js.
@@ -17,6 +16,7 @@ Reemplaza el documento de Excel donde se almacenaban los datos de los empleados 
   - Modificar los datos de un empleado
   - Eliminar empleados
   - Buscar empleados por nombre
+- Middlewares propios para autenticación, CORS, ruta de bienvenida y rutas no encontradas.
 - Interfaz web con Bootstrap 4.
 
 ## Tecnologías
@@ -26,7 +26,7 @@ Reemplaza el documento de Excel donde se almacenaban los datos de los empleados 
 | Servidor | Node.js, Express 5 |
 | Base de datos | MySQL / MariaDB (paquete `mysql`) |
 | Autenticación | `jsonwebtoken`, `bcrypt` |
-| Configuración | `dotenv`, `cors` |
+| Configuración | `dotenv` (el CORS se maneja con un middleware propio) |
 | Frontend | HTML, JavaScript, Bootstrap 4.3.1, Axios |
 
 ## Estructura del proyecto
@@ -36,9 +36,12 @@ RH_TallerNode/
 ├── config/
 │   └── database.js        # Pool de conexiones a MySQL
 ├── middleware/
-│   └── auth.js            # Verificación del token JWT
+│   ├── auth.js            # Verifica el token JWT
+│   ├── cors.js            # Encabezados CORS y respuesta a OPTIONS
+│   ├── index.js           # Mensaje de bienvenida (GET /)
+│   └── notFound.js        # Respuesta 404 en JSON
 ├── routes/
-│   ├── user.js            # Login y gestión de usuarios (/usuarios)
+│   ├── user.js            # Login (/usuarios/login)
 │   └── rh.js              # CRUD y búsqueda de empleados (/empleados)
 ├── RH/                    # Interfaz de usuario
 │   ├── index.html         # Redirige según exista sesión
@@ -105,7 +108,7 @@ Para generar una clave segura:
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
-### 4. Crear el usuario administrador
+### 4. Usuario administrador
 
 Los usuarios se dan de alta directamente en la base de datos; la aplicación no tiene registro de usuarios. Al importar `rh.sql` se crea un administrador inicial:
 
@@ -119,6 +122,7 @@ Para agregar otro administrador (la contraseña se guarda cifrada con bcrypt):
 ```bash
 node crear-admin.js <nombre> <correo> <contraseña>
 ```
+
 ### 5. Iniciar el servidor
 
 ```bash
@@ -130,7 +134,18 @@ El servidor queda disponible en `http://localhost:3000`.
 
 ### 6. Abrir la interfaz
 
-Abre `RH/login.html` desde un servidor estático (por ejemplo, la extensión *Live Server* de VS Code) e inicia sesión con el usuario creado en el paso 4.
+Abre `RH/login.html` desde un servidor estático (por ejemplo, la extensión *Live Server* de VS Code) e inicia sesión con el usuario del paso 4.
+
+## Middlewares
+
+Se ejecutan en este orden dentro de `index.js`:
+
+| Middleware | Archivo | Función | Dónde se aplica |
+|---|---|---|---|
+| CORS | `middleware/cors.js` | Agrega los encabezados CORS y responde con `204` a las peticiones `OPTIONS` | Todas las rutas |
+| Bienvenida | `middleware/index.js` | Responde con un mensaje de bienvenida | `GET /` |
+| Autenticación | `middleware/auth.js` | Verifica el token JWT y rechaza con `401` si falta, es inválido o venció | Todas las rutas de `/empleados` |
+| Ruta no encontrada | `middleware/notFound.js` | Responde `404` en JSON | Cualquier ruta que no exista |
 
 ## API
 
@@ -139,6 +154,12 @@ Todas las respuestas son JSON. Las rutas protegidas requieren el encabezado:
 ```
 Authorization: Bearer <token>
 ```
+
+### General
+
+| Método | Ruta | Descripción | Protegida |
+|---|---|---|---|
+| GET | `/` | Mensaje de bienvenida | No |
 
 ### Autenticación
 
@@ -166,72 +187,4 @@ Respuesta exitosa:
 | GET | `/empleados/:id` | Consulta un empleado por su id |
 | GET | `/empleados/buscar/:nombre` | Busca empleados por nombre (coincidencia parcial) |
 | POST | `/empleados` | Agrega un empleado |
-| PUT | `/empleados/:id` | Modifica todos los datos de un empleado |
-| PATCH | `/empleados/:id` | Modifica solo los campos enviados |
-| DELETE | `/empleados/:id` | Elimina un empleado |
-
-Cuerpo para `POST` y `PUT`:
-
-```json
-{
-  "nombre": "Ana",
-  "apellidos": "López Cruz",
-  "telefono": "7191234567",
-  "email": "ana@empresa.com",
-  "direccion": "Calle Hidalgo 12"
-}
-```
-
-### Códigos de respuesta
-
-| Código | Significado |
-|---|---|
-| 200 | Operación exitosa |
-| 201 | Registro creado |
-| 400 | Datos incompletos o inválidos |
-| 401 | Token ausente, inválido o vencido, o credenciales incorrectas |
-| 403 | Usuario inactivo |
-| 404 | Recurso no encontrado |
-| 409 | Registro duplicado |
-| 500 | Error interno del servidor |
-
-## Modelo de datos
-
-**empleado**
-
-| Campo | Descripción |
-|---|---|
-| `id_empleado` | Llave primaria, autoincremental |
-| `nombre` | Nombre del empleado |
-| `apellidos` | Apellidos |
-| `telefono` | Teléfono |
-| `email` | Correo electrónico |
-| `direccion` | Dirección |
-
-**usuario**
-
-| Campo | Descripción |
-|---|---|
-| `id_usuario` | Llave primaria, autoincremental |
-| `nombre_usuario` | Nombre del usuario |
-| `email_usuario` | Correo con el que inicia sesión |
-| `password` | Contraseña cifrada con bcrypt |
-| `estado` | `1` = activo, `0` = inactivo |
-
-## Seguridad
-
-- Las consultas SQL usan parámetros para evitar inyección SQL.
-- El login devuelve el mismo mensaje si el correo no existe o la contraseña es incorrecta.
-- El token se verifica en cada petición a rutas protegidas y se limita al algoritmo HS256.
-- El archivo `.env` está excluido del repositorio mediante `.gitignore`.
-
-## Despliegue
-
-- **URL en producción:** _pendiente de agregar_
-- **Plataforma:** _pendiente de agregar_
-
-Variables de entorno que debes configurar en la plataforma de despliegue: `PORT` (la asigna la plataforma), `JWT_SECRET`, `DB_HOST`, `DB_USER`, `DB_PASSWORD` y `DB_NAME`.
-
-## Autora
-
-_Jessica Pérez Carapia_
+| PUT | `/empleados/:id` | Modifica todos los
