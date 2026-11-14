@@ -31,11 +31,11 @@ USE `rh`;
 
 CREATE TABLE `empleado` (
   `id_empleado` int(11) NOT NULL,
-  `nombre` varchar(20) NOT NULL,
-  `apellidos` varchar(40) NOT NULL,
-  `telefono` varchar(15) NOT NULL,
-  `email` varchar(30) NOT NULL,
-  `direccion` varchar(50) NOT NULL
+  `nombre` varchar(100) NOT NULL,
+  `apellidos` varchar(150) NOT NULL,
+  `telefono` varchar(20) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `direccion` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -60,13 +60,16 @@ CREATE TABLE `usuario` (
 -- Indices de la tabla `empleado`
 --
 ALTER TABLE `empleado`
-  ADD PRIMARY KEY (`id_empleado`);
+  ADD PRIMARY KEY (`id_empleado`),
+  ADD UNIQUE KEY `uq_empleado_email` (`email`);
 
 --
 -- Indices de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  ADD PRIMARY KEY (`id_usuario`);
+  ADD PRIMARY KEY (`id_usuario`),
+  ADD UNIQUE KEY `uq_usuario_email` (`email_usuario`),
+  ADD UNIQUE KEY `uq_usuario_nombre` (`nombre_usuario`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -84,6 +87,11 @@ ALTER TABLE `empleado`
 ALTER TABLE `usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
+
+-- Usuario administrador inicial (alta directa en la base de datos)
+-- Correo: admin@empresa.com | Contraseña: RhAdmin2026
+INSERT INTO usuario (nombre_usuario, email_usuario, password, estado)
+VALUES ('admin', 'admin@empresa.com', '$2b$10$jVSuaISa/WxxWNfhm8VFAes/HrZJN11z/IiSzXx5IPZG2yDDTe90m', 1);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
