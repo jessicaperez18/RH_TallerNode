@@ -107,14 +107,18 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 
 ### 4. Crear el usuario administrador
 
-Los usuarios se dan de alta directamente en la base de datos. El script `crear-admin.js` inserta uno con la contraseña cifrada. Edita al inicio del archivo el nombre, el correo y la contraseña, y ejecútalo:
+Los usuarios se dan de alta directamente en la base de datos; la aplicación no tiene registro de usuarios. Al importar `rh.sql` se crea un administrador inicial:
+
+| Campo | Valor |
+|---|---|
+| Correo | `admin@empresa.com` |
+| Contraseña | `RhAdmin2026` |
+
+Para agregar otro administrador (la contraseña se guarda cifrada con bcrypt):
 
 ```bash
-node crear-admin.js
+node crear-admin.js <nombre> <correo> <contraseña>
 ```
-
-> Cambia la contraseña por defecto antes de ejecutarlo y no la compartas en el repositorio.
-
 ### 5. Iniciar el servidor
 
 ```bash
