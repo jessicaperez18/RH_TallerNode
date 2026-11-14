@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const user = express.Router();
 const db = require('../config/database');
-const verificarToken = require('../middleware/auth');
 
 user.post('/login', async (req, res) => {
     const { email_usuario, password } = req.body;
@@ -38,60 +37,6 @@ user.post('/login', async (req, res) => {
         );
 
         return res.status(200).json({ code: 200, token });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ code: 500, message: 'Error interno del servidor' });
-    }
-});
-
-user.use(verificarToken);
-
-// Registrar usuario
-user.post('/', async (req, res) => {
-    const { nombre_usuario, email_usuario, password } = req.body;
-
-    if (!(nombre_usuario && email_usuario && password)) {
-        return res.status(400).json({ code: 400, message: 'Campos incompletos' });
-    }
-
-    if (typeof email_usuario !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email_usuario)) {
-        return res.status(400).json({ code: 400, message: 'Correo inválido' });
-    }
-
-    if (typeof password !== 'string' || password.length < 8 || password.length > 72) {
-        return res.status(400).json({ code: 400, message: 'La contraseña debe tener entre 8 y 72 caracteres' });
-    }
-
-    try {
-        const hash = await bcrypt.hash(password, 10);
-
-        const result = await db.query(
-            `INSERT INTO usuario (nombre_usuario, email_usuario, password, estado)
-             VALUES (?, ?, ?, ?)`,
-            [nombre_usuario, email_usuario.trim().toLowerCase(), hash, 1]
-        );
-
-        if (result.affectedRows === 1) {
-            return res.status(201).json({ code: 201, message: 'Usuario registrado correctamente' });
-        }
-
-        return res.status(500).json({ code: 500, message: 'Ocurrió un error' });
-    } catch (err) {
-        if (err.code === 'ER_DUP_ENTRY') {
-            return res.status(409).json({ code: 409, message: 'El usuario o correo ya existe' });
-        }
-        console.error(err);
-        return res.status(500).json({ code: 500, message: 'Error interno del servidor' });
-    }
-});
-
-// Listar usuarios (sin contraseñas)
-user.get('/', async (req, res) => {
-    try {
-        const rows = await db.query(
-            'SELECT id_usuario, nombre_usuario, email_usuario, estado FROM usuario'
-        );
-        return res.status(200).json({ code: 200, data: rows });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ code: 500, message: 'Error interno del servidor' });
