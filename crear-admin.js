@@ -1,9 +1,12 @@
 const bcrypt = require('bcrypt');
 const db = require('./config/database');
 
-const nombre = 'admin';
-const email = 'admin@empresa.com';      
-const password = 'TNodeRH23';  
+const [nombre, email, password] = process.argv.slice(2);
+
+if (!nombre || !email || !password) {
+    console.log('Uso: node crear-admin.js <nombre> <correo> <contraseña>');
+    process.exit(1);
+}
 
 (async () => {
     try {
