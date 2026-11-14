@@ -1,7 +1,9 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
 
+const cors = require('./middleware/cors');
+const index = require('./middleware/index');
+const notFound = require('./middleware/notFound');
 const user = require('./routes/user');
 const rh = require('./routes/rh');
 
@@ -15,22 +17,18 @@ if (!process.env.JWT_SECRET) {
 }
 
 // Middlewares
-app.use(cors());
+app.use(cors);
 app.use(express.json());
 
-// Ruta de prueba
-app.get('/', (req, res) => {
-  res.json({ mensaje: 'Servidor funcionando' });
-});
+// Ruta de bienvenida
+app.get('/', index);
 
 // Routers
 app.use('/usuarios', user);
 app.use('/empleados', rh);
 
 // Ruta no encontrada (404 en JSON, no en HTML)
-app.use((req, res) => {
-  res.status(404).json({ code: 404, message: 'Ruta no encontrada' });
-});
+app.use(notFound);
 
 // Manejo de errores
 app.use((err, req, res, next) => {

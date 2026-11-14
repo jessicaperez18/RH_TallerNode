@@ -187,4 +187,69 @@ Respuesta exitosa:
 | GET | `/empleados/:id` | Consulta un empleado por su id |
 | GET | `/empleados/buscar/:nombre` | Busca empleados por nombre (coincidencia parcial) |
 | POST | `/empleados` | Agrega un empleado |
-| PUT | `/empleados/:id` | Modifica todos los
+| PUT | `/empleados/:id` | Modifica todos los datos de un empleado |
+| PATCH | `/empleados/:id` | Modifica solo los campos enviados |
+| DELETE | `/empleados/:id` | Elimina un empleado |
+
+Cuerpo para `POST` y `PUT`:
+
+```json
+{
+  "nombre": "Ana",
+  "apellidos": "López Cruz",
+  "telefono": "7191234567",
+  "email": "ana@empresa.com",
+  "direccion": "Calle Hidalgo 12"
+}
+```
+
+### Códigos de respuesta
+
+| Código | Significado |
+|---|---|
+| 200 | Operación exitosa |
+| 201 | Registro creado |
+| 400 | Datos incompletos o inválidos |
+| 401 | Token ausente, inválido o vencido, o credenciales incorrectas |
+| 403 | Usuario inactivo |
+| 404 | Recurso o URL no encontrada |
+| 409 | Registro duplicado (por ejemplo, un correo ya registrado) |
+| 500 | Error interno del servidor |
+
+## Modelo de datos
+
+**empleado**
+
+| Campo | Descripción |
+|---|---|
+| `id_empleado` | Llave primaria, autoincremental |
+| `nombre` | Nombre del empleado |
+| `apellidos` | Apellidos |
+| `telefono` | Teléfono |
+| `email` | Correo electrónico (único) |
+| `direccion` | Dirección |
+
+**usuario**
+
+| Campo | Descripción |
+|---|---|
+| `id_usuario` | Llave primaria, autoincremental |
+| `nombre_usuario` | Nombre del usuario (único) |
+| `email_usuario` | Correo con el que inicia sesión (único) |
+| `password` | Contraseña cifrada con bcrypt |
+| `estado` | `1` = activo, `0` = inactivo |
+
+## Seguridad
+
+- Las consultas SQL usan parámetros para evitar inyección SQL.
+- El login devuelve el mismo mensaje si el correo no existe o la contraseña es incorrecta.
+- El token se verifica en cada petición a rutas protegidas y se limita al algoritmo HS256.
+- El archivo `.env` está excluido del repositorio mediante `.gitignore`.
+
+## Despliegue
+
+No realizado.
+
+## Autora
+
+Jessica Pérez Carapia
